@@ -1,6 +1,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <cmath>
 using namespace std;
 
 template <typename T>
@@ -33,7 +34,7 @@ class FibonacciHeap {
     FibonacciNode<T> *minNode;
     int size_;
 
-    void merge(FibonacciNode<T> *x, FibonacciNode<T> *y) {
+    FibonacciNode<T>* merge(FibonacciNode<T> *x, FibonacciNode<T> *y) {
         //If x > y then swap the pointers
         //So that x < y and can be the parent
         //always
@@ -55,7 +56,26 @@ class FibonacciHeap {
         x->child = y;
         y->parent = x;
         x->degree++;
+        return x;
+    }
 
+    void mergeRootList() {
+        int maxDegree = floor(log2(size_)) + 1;
+        vector<vector<FibonacciNode<T>*>> degreeList(maxDegree);
+        FibonacciNode<T> *start = minNode;
+        FibonacciNode<T> *currNode = minNode;
+
+        do {
+            degreeList[currNode->degree].push_back(currNode);
+            currNode = currNode->rightNode;
+        } while(currNode != start);
+
+        for(int i = 0; i < degreeList.size(); ++i) {
+            for (int j = 0; j+1 < degreeList[i].size(); j += 2) {
+                currNode = merge(degreeList[i][j], degreeList[i][j+1]);
+                degreeList[currNode->degree].push_back(currNode);
+            }
+        }
     }
 
     public:
@@ -98,6 +118,15 @@ class FibonacciHeap {
         }
         printTree(x->rightNode);
     }
+
+    void extractMin() {
+        if (!minNode) return;
+
+        //If the minNode has no children
+        if (minNode->child == nullptr) {
+            
+        }
+    }
 };
 
 int main() {
@@ -107,15 +136,6 @@ int main() {
     myList.insert(77);
     myList.insert(0);
     myList.insert(7);
-
-    FibonacciNode<int> *x = myList.GetMin();
-    FibonacciNode<int> *y = x->rightNode;
-    myList.mergeRoots(x, y);
-
-    x = myList.GetMin();
-    y = x->rightNode;
-    myList.mergeRoots(x, y);
-
     FibonacciNode<int> *z = myList.GetMin();
     myList.printTree(z);
 }
