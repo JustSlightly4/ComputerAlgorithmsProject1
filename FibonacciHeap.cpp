@@ -9,6 +9,7 @@ class FibonacciNode {
     T data;
     int degree;
     bool marked;
+    bool printed;
     FibonacciNode<T> *parent;
     FibonacciNode<T> *child;
     FibonacciNode<T> *rightNode;
@@ -18,6 +19,7 @@ class FibonacciNode {
         data = key;
         degree = 0;
         marked = false;
+        printed = false;
         parent = nullptr;
         child = nullptr;
         rightNode = this;
@@ -31,7 +33,7 @@ class FibonacciHeap {
     FibonacciNode<T> *minNode;
     int size_;
 
-    void mergeRoots(FibonacciNode<T> *x, FibonacciNode<T> *y) {
+    void merge(FibonacciNode<T> *x, FibonacciNode<T> *y) {
         //If x > y then swap the pointers
         //So that x < y and can be the parent
         //always
@@ -40,12 +42,31 @@ class FibonacciHeap {
         //Remove y from this list so it can be the child of x
         y->leftNode->rightNode = y->rightNode;
         y->rightNode->leftNode = y->leftNode;
+        y->leftNode = y;
+        y->rightNode = y;
+
+        //If x already has a child do some extra work
+        if (x->child != nullptr) {
+            y->rightNode = x->child;
+            y->leftNode = x->child->leftNode;
+            x->child->leftNode->rightNode = y;
+            x->child->leftNode = y;
+        }
+        x->child = y;
+        y->parent = x;
+        x->degree++;
+
     }
 
     public:
     FibonacciHeap() {
         minNode = nullptr;
         size_ = 0;
+    }
+
+    FibonacciNode<T> *GetMin() {
+        if (minNode == nullptr) exit(1);
+        return minNode;
     }
 
     void insert(T key) {
@@ -64,22 +85,37 @@ class FibonacciHeap {
         size_++;
     }
 
-
-
-    void print() {
-        FibonacciNode<T> *currNode = minNode;
-        for (int i = 0; i < size_; ++i) {
-            cout << currNode->data << " ";
-            currNode = currNode->rightNode;
+    void printTree(FibonacciNode<T> *x) {
+        if (x->printed == true) {
+            if (x->parent != nullptr) cout << "] ";
+            return;
         }
-        cout << "\n";
+        x->printed = true;
+        cout << x->data << " ";
+        if (x->child != nullptr) { //If x has a child
+            cout << "[ ";
+            printTree(x->child);
+        }
+        printTree(x->rightNode);
     }
 };
 
 int main() {
     FibonacciHeap<int> myList;
+    myList.insert(5);
     myList.insert(99);
-    myList.insert(888);
-    myList.insert(1);
-    myList.print();
+    myList.insert(77);
+    myList.insert(0);
+    myList.insert(7);
+
+    FibonacciNode<int> *x = myList.GetMin();
+    FibonacciNode<int> *y = x->rightNode;
+    myList.mergeRoots(x, y);
+
+    x = myList.GetMin();
+    y = x->rightNode;
+    myList.mergeRoots(x, y);
+
+    FibonacciNode<int> *z = myList.GetMin();
+    myList.printTree(z);
 }
