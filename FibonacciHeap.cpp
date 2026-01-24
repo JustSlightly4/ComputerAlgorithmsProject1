@@ -1,10 +1,7 @@
 #include <iostream>
-#include <list>
 #include <vector>
 #include <cmath>
-#include <set>
-#include <string>
-#include <sstream>
+#include <fstream>
 using namespace std;
 
 template <typename T>
@@ -34,8 +31,8 @@ class FibonacciNode {
 template <typename T>
 class FibonacciHeap {
     private:
-    FibonacciNode<T> *minNode;
-    int size_;
+    FibonacciNode<T> *minNode; //The minimum node in the heap
+    int size_; //How many nodes are currently in the heap
 
     //Prints the entire tree but only works once :)
     void printTree_(FibonacciNode<T> *x) {
@@ -52,18 +49,93 @@ class FibonacciHeap {
         printTree_(x->rightNode);
     }
 
+    //Writes the entire tree but only works once :)
+    void writeTree_(ofstream& out, FibonacciNode<T> *x) {
+        if (x->printed == true) {
+            return;
+        }
+        out << x->data << " -> " << x->rightNode->data << " [tailport=e, headport=w];\n";
+        //out << x->leftNode->data << " -> " << x->data << " [tailport=w, headport=w];\n";
+        out << "{rank = same; " << x->data << "; " << x->leftNode->data << "; " << x->rightNode->data << "; }\n";
+        if (x->parent != nullptr) out << x->data << " -> " << x->parent->data << "\n";
+        x->printed = true;
+        if (x->child != nullptr) { //If x has a child
+            out << x->data << " -> " << x->child->data << "\n";
+            writeTree_(out, x->child);
+        }
+        writeTree_(out, x->rightNode);
+    }
+
+    //Inserts a node into the tree by ptr
+    //DOES NOT INCREASE THE SIZE!!
+    void insert(FibonacciNode<T> *node) {
+        if (minNode == nullptr) { //If list is empty
+            minNode = node;
+            minNode->rightNode = minNode;
+            minNode->leftNode = minNode;
+        } else { //If the list already has a node
+            node->rightNode = minNode;
+            node->leftNode = minNode->leftNode;
+            minNode->leftNode->rightNode = node;
+            minNode->leftNode = node;
+            if (node->data < minNode->data) { //If the new node is less than the current min
+                minNode = node;
+            }
+        }
+    }
+
+    //Cuts the given node out of the root list
+    //User should still have pointer even
+    //though its been removed from list
+    //This is not meant to be used for anything
+    //other than the root list!
+    void cut(FibonacciNode<T> *y) {
+        y->marked = false;
+        y->leftNode->rightNode = y->rightNode;
+        y->rightNode->leftNode = y->leftNode;
+        y->leftNode = y;
+        y->rightNode = y;
+    }
+
+    //Cuts the give node out of the list
+    //where ever it may be and adds it back
+    //to the root list
+    void cut_and_add(FibonacciNode<T> *y) {
+
+        //If y has a parent
+        //There are three senarios
+        //1: the parents direct child is y and y has no siblings
+        //2: the parents direct child is y and y has siblings
+        //3: the parents direct child is not y
+        FibonacciNode<T>* parent = y->parent;
+        if (y->parent) {
+            if (y->parent->child == y && y->rightNode == y) { //1: the parents direct child is y and y has no siblings
+                y->parent->child = nullptr;
+            } else if (y->parent->child == y) { //2: the parents direct child is y and y has siblings
+                y->parent->child = y->rightNode;
+            }
+            --y->parent->degree;
+            y->parent = nullptr;
+        }
+        y->marked = false;
+        y->leftNode->rightNode = y->rightNode;
+        y->rightNode->leftNode = y->leftNode;
+        y->leftNode = y;
+        y->rightNode = y;
+
+        insert(y);
+    }
+
     //Merges two nodes together
+    //Returns a ptr to the top level node
     FibonacciNode<T>* merge(FibonacciNode<T> *x, FibonacciNode<T> *y) {
         //If x > y then swap the pointers
         //So that x < y and can be the parent
         //always
         if (x->data > y->data) swap(x, y);
 
-        //Remove y from this list so it can be the child of x
-        y->leftNode->rightNode = y->rightNode;
-        y->rightNode->leftNode = y->leftNode;
-        y->leftNode = y;
-        y->rightNode = y;
+        //Cut y (the larger one) out of the list
+        cut(y);
 
         //If x already has a child do some extra work
         if (x->child != nullptr) {
@@ -72,45 +144,87 @@ class FibonacciHeap {
             x->child->leftNode->rightNode = y;
             x->child->leftNode = y;
         }
+
         x->child = y;
         y->parent = x;
-        x->degree++;
+        ++x->degree;
         return x;
     }
 
-    //Merges the entire root list
-    //The min pointer should always be maintained since
-    //it'll always be pushed to the top
+    //Merges all the root nodes of the same degree together
     void mergeRootList() {
-        int maxDegree = floor(log2(size_)) + 1;
-        vector<vector<FibonacciNode<T>*>> degreeList(maxDegree);
-        FibonacciNode<T> *start = minNode;
-        FibonacciNode<T> *currNode = minNode;
 
+        //If the list is empty or if the list
+        //only has one node do nothing
+        if (size_ < 2) return;
+
+        //Get the max degree of the list and make a
+        //vector of fibonacci nodes that all all init to
+        //nullptr
+        int maxDegree = floor(log2(size_)) + 2;
+        vector<FibonacciNode<T>*> degreeList(maxDegree, nullptr);
+
+        //Get the number of roots that currently exist
+        int rootCount = 0;
+        FibonacciNode<T>* temp = minNode;
         do {
-            degreeList[currNode->degree].push_back(currNode);
-            currNode = currNode->rightNode;
-        } while(currNode != start);
+            rootCount++;
+            temp = temp->rightNode;
+        } while (temp != minNode);
 
-        for(int i = 0; i < degreeList.size(); ++i) {
-            for (int j = 0; j+1 < degreeList[i].size(); j += 2) {
-                currNode = merge(degreeList[i][j], degreeList[i][j+1]);
-                degreeList[currNode->degree].push_back(currNode);
+        //Main loop. Loops through all original root nodes
+        FibonacciNode<T>* currNode = minNode;
+        for (int i = 0; i < rootCount; ++i) {
+
+            //Advance the nextNode so that we always maintain a ptr
+            //to the original root list
+            FibonacciNode<T>* nextNode = currNode->rightNode;
+
+            //Cut out the current node
+            cut(currNode);
+
+            //Check the current node against the degree list.
+            //If a collision occurs, merge the two nodes.
+            //Then, move the new node group up the table and repeat
+            //until a free space in the list is found to put the group.
+            while (degreeList[currNode->degree] != nullptr) {
+                FibonacciNode<T>* other = degreeList[currNode->degree];
+                degreeList[currNode->degree] = nullptr;
+                currNode = merge(currNode, other);
             }
+
+            //Place the new node group into the newly found free space
+            //in the degree list.
+            degreeList[currNode->degree] = currNode;
+
+            //Advance the current node to be the next node
+            //we kept before
+            currNode = nextNode;
+        }
+
+        //All nodes should now be in the degree list and compacted consolodated together
+        //So, simplely insert each index back into the tree if its not null.
+        minNode = nullptr;
+        for (auto* node : degreeList) {
+            if (node) insert(node);
         }
     }
 
     public:
-
     //Constructor
     FibonacciHeap() {
         minNode = nullptr;
         size_ = 0;
     }
 
-    //Inserts a new node into the heap by value
-    void insert(T key) {
-        FibonacciNode<T> *node = new FibonacciNode<T>(key);
+    //Returns the size of the list
+    int size() {
+        return size_;
+    }
+
+    //Inserts a new node into the heap by value/key
+    FibonacciNode<T>* insert(T value) {
+        FibonacciNode<T>* node = new FibonacciNode<T>(value);
         if (minNode == nullptr) { //If list is empty
             minNode = node;
         } else { //If the list already has a node
@@ -123,11 +237,29 @@ class FibonacciHeap {
             }
         }
         size_++;
+        return node;
     }
 
     void printTree() {
         if (size_ < 1) return;
         printTree_(minNode);
+    }
+
+    //This writes the structure of the tree to a .dot file.
+    //This file can then be copy and pasted to GraphvizOnline
+    //to be able to visualize the tree
+    void writeTree() {
+        if (size_ < 1) return;
+        ofstream out("heap.dot");
+        out << "digraph FibonacciHeap {\n";
+        out << "  node [shape=circle];\n";
+        writeTree_(out, minNode);
+        out << "\n}";
+    }
+
+    //Get min nodes data without extracting it
+    T min() {
+        return minNode->data;
     }
 
     //Extracts the minimum values in the heap
@@ -182,49 +314,15 @@ class FibonacciHeap {
         
         mergeRootList();
     }
-
-    void generateDot(FibonacciNode<T>* node, std::set<FibonacciNode<T>*>& visited, std::stringstream& ss) {
-        if (!node || visited.count(node)) return;
-        visited.insert(node);
-
-        // Create the node label
-        ss << "  node" << node << " [label=\"" << node->data << "\"];\n";
-
-        // Link to Right Sibling (Circular)
-        if (node->rightNode) {
-            ss << "  node" << node << " -> node" << node->rightNode << " [color=blue, label=\"next\"];\n";
-            generateDot(node->rightNode, visited, ss);
-        }
-
-        // Link to Child
-        if (node->child) {
-            ss << "  node" << node << " -> node" << node->child << " [style=bold, label=\"child\"];\n";
-            generateDot(node->child, visited, ss);
-        }
-    }
-
-    void printDot() {
-        std::stringstream ss;
-        std::set<FibonacciNode<T>*> visited;
-        ss << "digraph G {\n";
-        ss << "  rankdir=TB;\n";
-        if (minNode) generateDot(minNode, visited, ss);
-        ss << "}\n";
-        cout << ss.str() << endl;
-    }
 };
 
 int main() {
     FibonacciHeap<int> myList;
-    for (int i = 0; i < 6; ++i) {
-        myList.insert(0);
+    for (int i = 0; i < 10; ++i) {
+        myList.insert(i);
     }
-    /*
-    for (int i = 0; i < 6; ++i) {
-        myList.extractMin();
-    }
-    */
     myList.extractMin();
-    myList.extractMin();
-    myList.printDot();
+    myList.writeTree();
+    cout << "\nMinimum: " << myList.min() << "\n";
+    cout << "Size: " << myList.size() << "\n";
 }
