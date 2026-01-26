@@ -100,14 +100,14 @@ class FibonacciHeap {
     //Cuts the give node out of the list
     //where ever it may be and adds it back
     //to the root list
-    void cut_and_add(FibonacciNode<T> *y) {
+    void cascadingCut(FibonacciNode<T> *y) {
 
         //If y has a parent
         //There are three senarios
         //1: the parents direct child is y and y has no siblings
         //2: the parents direct child is y and y has siblings
         //3: the parents direct child is not y
-        FibonacciNode<T>* parent = y->parent;
+        FibonacciNode<T>* parent = y->parent; //ptr to y's parent
         if (y->parent) {
             if (y->parent->child == y && y->rightNode == y) { //1: the parents direct child is y and y has no siblings
                 y->parent->child = nullptr;
@@ -117,13 +117,19 @@ class FibonacciHeap {
             --y->parent->degree;
             y->parent = nullptr;
         }
-        y->marked = false;
-        y->leftNode->rightNode = y->rightNode;
-        y->rightNode->leftNode = y->leftNode;
-        y->leftNode = y;
-        y->rightNode = y;
 
+        //Cut out node and insert it into root list
+        cut(y);
         insert(y);
+
+        //Mark or cut parent
+        if (parent) {
+            if (!parent->marked) {
+                parent->marked = true;
+            } else {
+                cascadingCut(parent);
+            }
+        }
     }
 
     //Merges two nodes together
@@ -217,6 +223,13 @@ class FibonacciHeap {
         size_ = 0;
     }
 
+    //Deconstructor
+    ~FibonacciHeap() {
+        for (int i = 0; i < size_; ++i) {
+            extractMin();
+        }
+    }
+
     //Returns the size of the list
     int size() {
         return size_;
@@ -253,6 +266,7 @@ class FibonacciHeap {
         ofstream out("heap.dot");
         out << "digraph FibonacciHeap {\n";
         out << "  node [shape=circle];\n";
+        out << "  minNode -> " << minNode->data << "\n";
         writeTree_(out, minNode);
         out << "\n}";
     }
@@ -314,14 +328,30 @@ class FibonacciHeap {
         
         mergeRootList();
     }
+
+    void decreaseKey(FibonacciNode<T> *y, T value) {
+        if (y->data < value) return; //Make sure this only decreases key
+        y->data = value;
+        if (y->parent) { //If y has a parent
+            if (y->parent->data > y->data) { //If y is now less than its parent
+                cascadingCut(y);
+            }
+        } else { //If y has no parent is it less than the minNode?
+            if (y->data < minNode->data) minNode = y;
+        }
+    }
 };
 
 int main() {
     FibonacciHeap<int> myList;
-    for (int i = 0; i < 10; ++i) {
+    FibonacciNode<int> *firstNode;
+    FibonacciNode<int> *lastNode;
+    firstNode = myList.insert(9);
+    for (int i = 10; i < 20; ++i) {
         myList.insert(i);
     }
-    myList.extractMin();
+    lastNode = myList.insert(20);
+    myList.decreaseKey(lastNode, 0);
     myList.writeTree();
     cout << "\nMinimum: " << myList.min() << "\n";
     cout << "Size: " << myList.size() << "\n";
