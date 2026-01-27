@@ -227,7 +227,7 @@ class FibonacciHeap {
 
     //Deconstructor
     ~FibonacciHeap() {
-        for (int i = 0; i < size_; ++i) {
+        while(minNode) {
             extractMin();
         }
     }

@@ -14,7 +14,7 @@ double getTime() {
 
 //Adds values and prints out heap
 template <typename HeapType>
-void UnitTest0(HeapType& heap) {
+void VisualTest(HeapType& heap) {
     for (int i = 0; i < 10; ++i) {
         heap.insert(i);
     }
@@ -26,7 +26,7 @@ void UnitTest0(HeapType& heap) {
 
 //Times the amount of insertions into the heap
 template <typename HeapType>
-void UnitTest1(HeapType& heap, int amount) {
+void TimingTest1(HeapType& heap, int amount) {
     double startTime = getTime();
     for (int i = 0; i < amount; ++i) {
         heap.insert(amount);
@@ -37,7 +37,7 @@ void UnitTest1(HeapType& heap, int amount) {
 
 //Times the amount of insertions and extracts from the heap
 template <typename HeapType>
-void UnitTest2(HeapType& heap, int amount) {
+void TimingTest2(HeapType& heap, int amount) {
     double startTime = getTime();
     for (int i = 0; i < amount; ++i) {
         heap.insert(i);
@@ -49,13 +49,76 @@ void UnitTest2(HeapType& heap, int amount) {
     cout << endTime - startTime << "\n";
 }
 
+template <typename HeapType1, typename HeapType2, typename HeapType3>
+bool UnitTest1(HeapType1 &A, HeapType2 &B, HeapType3 &C) {
+    for (int i = 0; i < 300; ++i) {
+        A.insert(i);
+        B.insert(i);
+        C.insert(i);
+    }
+    for (int i = 0; i < 150; ++i) {
+        if (!(A.min() == B.min() && B.min() == C.min())) return false;
+        A.extractMin();
+        B.extractMin();
+        C.extractMin();
+    }
+    return true;
+}
+
+template <typename HeapType1, typename HeapType2, typename HeapType3>
+bool UnitTest2(HeapType1 &A, HeapType2 &B, HeapType3 &C) {
+    for (int i = 0; i < 300; ++i) {
+        A.insert(i);
+        B.insert(i);
+        C.insert(i);
+    }
+    for (int i = 0; i < 300; ++i) {
+        if (!(A.min() == B.min() && B.min() == C.min())) return false;
+        A.extractMin();
+        B.extractMin();
+        C.extractMin();
+    }
+    return true;
+}
+
+template <typename HeapType1, typename HeapType2, typename HeapType3>
+bool UnitTest3(HeapType1 &A, HeapType2 &B, HeapType3 &C) {
+    for (int i = 0; i < 300; ++i) {
+        A.insert(1);
+        B.insert(1);
+        C.insert(1);
+    }
+    for (int i = 0; i < 300; ++i) {
+        if (!(A.min() == B.min() && B.min() == C.min())) return false;
+        A.extractMin();
+        B.extractMin();
+        C.extractMin();
+    }
+    return true;
+}
+
+template <typename HeapType1, typename HeapType2, typename HeapType3>
+bool UnitTest3(HeapType1 &A, HeapType2 &B, HeapType3 &C) {
+    for (int i = 0; i < 300; ++i) {
+        A.insert(1);
+        B.insert(1);
+        C.insert(1);
+    }
+    for (int i = 0; i < 300; ++i) {
+        if (!(A.min() == B.min() && B.min() == C.min())) return false;
+        A.extractMin();
+        B.extractMin();
+        C.extractMin();
+    }
+    return true;
+}
 
 int main() {
     FibonacciHeap<int> fibHeap;
     PairingHeap<int> pairingHeap;
     Heap<int> heap;
-    int amount = 15000;
-    UnitTest2(fibHeap, amount);
-    UnitTest2(pairingHeap, amount);
-    UnitTest2(heap, amount);
+    int amount = 100000;
+    cout << "Unit Test 1: " << (UnitTest1(fibHeap, pairingHeap, heap) ? "true\n" : "false\n");
+    cout << "Unit Test 2: " << (UnitTest2(fibHeap, pairingHeap, heap) ? "true\n" : "false\n");
+    cout << "Unit Test 3: " << (UnitTest3(fibHeap, pairingHeap, heap) ? "true\n" : "false\n");
 }

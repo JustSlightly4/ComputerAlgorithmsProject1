@@ -1,6 +1,7 @@
 #ifndef PAIRINGHEAPH
 #define PAIRINGHEAPH
 #include <iostream>
+#include <vector>
 using namespace std;
 
 template <typename T>
@@ -48,24 +49,36 @@ class PairingHeap {
         return x;
     }
 
-    PairingHeapNode<T>* twoPassMerge(PairingHeapNode<T>* x) {
-        //Base case
-        if (!x || !x->rightSibling) return x;
+    PairingHeapNode<T>* twoPassMerge(PairingHeapNode<T>* first) {
+        if (!first) return nullptr;
 
-        PairingHeapNode<T>* A = x;
-        PairingHeapNode<T>* B = x->rightSibling;
-        PairingHeapNode<T>* restOfList = x->rightSibling->rightSibling;
+        // First pass: pair siblings left to right
+        std::vector<PairingHeapNode<T>*> mergedPairs;
 
-        // Detach A and B
-        A->rightSibling = nullptr;
-        A->leftSibling = nullptr;
+        PairingHeapNode<T>* curr = first;
+        while (curr) {
+            PairingHeapNode<T>* a = curr;
+            PairingHeapNode<T>* b = curr->rightSibling;
+            PairingHeapNode<T>* next = nullptr;
+            if (b) next = b->rightSibling;
 
-        B->rightSibling = nullptr;
-        B->leftSibling = nullptr;
+            // Detach
+            a->leftSibling = a->rightSibling = nullptr;
+            if (b) b->leftSibling = b->rightSibling = nullptr;
 
-        if (restOfList) restOfList->leftSibling = nullptr;
+            // Merge a and b
+            mergedPairs.push_back(merge(a, b));
 
-        return merge(merge(A, B), twoPassMerge(restOfList));
+            curr = next;
+        }
+
+        // Second pass: merge right to left
+        PairingHeapNode<T>* result = nullptr;
+        for (int i = mergedPairs.size() - 1; i >= 0; --i) {
+            result = merge(result, mergedPairs[i]);
+        }
+
+        return result;
     }
 
     public:

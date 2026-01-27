@@ -109,7 +109,7 @@ class Heap {
 
     //Returns the current minimum value in the heap
     T min() const {
-        return *heap[0];
+        return heap[0]->data;
     }
 };
 #endif
