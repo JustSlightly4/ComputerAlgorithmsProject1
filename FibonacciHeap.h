@@ -1,3 +1,5 @@
+#ifndef FIBONACCIHEAPH
+#define FIBONACCIHEAPH
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -253,9 +255,10 @@ class FibonacciHeap {
         return node;
     }
 
-    void printTree() {
+    void print() {
         if (size_ < 1) return;
         printTree_(minNode);
+        cout << "\n";
     }
 
     //This writes the structure of the tree to a .dot file.
@@ -271,8 +274,8 @@ class FibonacciHeap {
         out << "\n}";
     }
 
-    //Get min nodes data without extracting it
-    T min() {
+    //Returns the current minimum value in the heap
+    T min() const {
         return minNode->data;
     }
 
@@ -341,18 +344,4 @@ class FibonacciHeap {
         }
     }
 };
-
-int main() {
-    FibonacciHeap<int> myList;
-    FibonacciNode<int> *firstNode;
-    FibonacciNode<int> *lastNode;
-    firstNode = myList.insert(9);
-    for (int i = 10; i < 20; ++i) {
-        myList.insert(i);
-    }
-    lastNode = myList.insert(20);
-    myList.decreaseKey(lastNode, 0);
-    myList.writeTree();
-    cout << "\nMinimum: " << myList.min() << "\n";
-    cout << "Size: " << myList.size() << "\n";
-}
+#endif

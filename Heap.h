@@ -1,3 +1,5 @@
+#ifndef HEAPH
+#define HEAPH
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -93,7 +95,7 @@ class Heap {
 
     //Given a node in the heap decrease its value and percolate it up
     void decreaseKey(HeapNode<T> *node, T value) {
-        if (node->data < value) return; //Make sure this only decreases key
+        if (!node || node->data < value) return; //Make sure this only decreases key
         node->data = value;
         percolateUp(node->index);
     }
@@ -104,16 +106,10 @@ class Heap {
             cout << heap[i]->data << " ";
         }
     }
-};
 
-int main() {
-    Heap<int> myList;
-    HeapNode<int> *lastNode;
-    for (int i = 1; i < 30; ++i) {
-        lastNode = myList.insert(i);
+    //Returns the current minimum value in the heap
+    T min() const {
+        return *heap[0];
     }
-    myList.decreaseKey(lastNode, 0);
-    myList.print();
-    cout << endl;
-    return 0;
-}
+};
+#endif
