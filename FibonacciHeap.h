@@ -340,17 +340,12 @@ class FibonacciHeap {
     void decreaseKey(K key, T value) {
         FibonacciNode<K, T> *y = nullptr;
 
-        //Try to get the node from the map using the key
-        try { 
-            y = nodeMap.at(key);
-
-        //Catch exception if can't find node and just return without doing anything
-        } catch (const exception &e) { 
-            return;
-        }
-
+        auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
+        if (it == nodeMap.end()) return; //If it does not exist return
+        y = it->second; //Set node ptr equal to the found node
         if (y->data < value) return; //Make sure this only decreases key
-        y->data = value;
+        y->data = value; //Update value
+
         if (y->parent) { //If y has a parent
             if (y->parent->data > y->data) { //If y is now less than its parent
                 cascadingCut(y);

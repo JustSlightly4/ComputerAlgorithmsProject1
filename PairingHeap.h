@@ -2,33 +2,39 @@
 #define PAIRINGHEAPH
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
-template <typename T>
+template <typename K, typename T>
 class PairingHeapNode {
     public:
+    K key;
     T data;
-    PairingHeapNode<T> *parent;
-    PairingHeapNode<T> *child;
-    PairingHeapNode<T> *leftSibling;
-    PairingHeapNode<T> *rightSibling;
+    PairingHeapNode<K, T> *parent;
+    PairingHeapNode<K, T> *child;
+    PairingHeapNode<K, T> *leftSibling;
+    PairingHeapNode<K, T> *rightSibling;
 
-    PairingHeapNode(T value) {
-        data = value;
-        parent = nullptr;
-        child = nullptr;
-        leftSibling = nullptr;
-        rightSibling = nullptr;
+    PairingHeapNode(K key, T value) {
+        this->key = key;
+        this->data = value;
+        this->parent = nullptr;
+        this->child = nullptr;
+        this->leftSibling = nullptr;
+        this->rightSibling = nullptr;
     }
 };
 
-template <typename T>
+template <typename K,typename T>
 class PairingHeap {
     private:
-    PairingHeapNode<T> *minNode;
+    PairingHeapNode<K, T> *minNode;
+    unordered_map<K, PairingHeapNode<K, T>*> nodeMap;
+
 
     //Merges two root nodes together
-    PairingHeapNode<T>* merge(PairingHeapNode<T>* x, PairingHeapNode<T>* y) {
+    PairingHeapNode<K, T>* merge(PairingHeapNode<K, T>* x, PairingHeapNode<K, T>* y) {
+
         //If one of the nodes is null return the other node
         if (!x) return y;
         if (!y) return x;
@@ -49,17 +55,17 @@ class PairingHeap {
         return x;
     }
 
-    PairingHeapNode<T>* twoPassMerge(PairingHeapNode<T>* first) {
+    PairingHeapNode<K, T>* twoPassMerge(PairingHeapNode<K, T>* first) {
         if (!first) return nullptr;
 
         // First pass: pair siblings left to right
-        std::vector<PairingHeapNode<T>*> mergedPairs;
+        std::vector<PairingHeapNode<K, T>*> mergedPairs;
 
-        PairingHeapNode<T>* curr = first;
+        PairingHeapNode<K, T>* curr = first;
         while (curr) {
-            PairingHeapNode<T>* a = curr;
-            PairingHeapNode<T>* b = curr->rightSibling;
-            PairingHeapNode<T>* next = nullptr;
+            PairingHeapNode<K, T>* a = curr;
+            PairingHeapNode<K, T>* b = curr->rightSibling;
+            PairingHeapNode<K, T>* next = nullptr;
             if (b) next = b->rightSibling;
 
             // Detach
@@ -73,7 +79,7 @@ class PairingHeap {
         }
 
         // Second pass: merge right to left
-        PairingHeapNode<T>* result = nullptr;
+        PairingHeapNode<K, T>* result = nullptr;
         for (int i = mergedPairs.size() - 1; i >= 0; --i) {
             result = merge(result, mergedPairs[i]);
         }
@@ -95,21 +101,23 @@ class PairingHeap {
     }
 
     //Insert a new value into the tree
-    PairingHeapNode<T>* insert(T value) {
-        PairingHeapNode<T> *node = new PairingHeapNode<T>(value);
+    void insert(K key, T value) {
+        PairingHeapNode<K, T> *node = new PairingHeapNode<K, T>(key, value);
+        nodeMap[key] = node;
         minNode = merge(minNode, node);
-        return node;
     }
 
     //Extracts the minimum value from the heap
     void extractMin() {
         if (!minNode) return;
 
-        PairingHeapNode<T>* old = minNode;
-        PairingHeapNode<T>* children = minNode->child;
+        nodeMap.erase(minNode->key);
+
+        PairingHeapNode<K, T>* old = minNode;
+        PairingHeapNode<K, T>* children = minNode->child;
 
         // Clear parent pointers
-        PairingHeapNode<T>* currNode = children;
+        PairingHeapNode<K, T>* currNode = children;
         while (currNode) {
             currNode->parent = nullptr;
             currNode = currNode->rightSibling;
@@ -119,11 +127,16 @@ class PairingHeap {
         minNode = twoPassMerge(children);
     }
 
-    void decreaseKey(PairingHeapNode<T>* node, T value) {
-    if (!node || value > node->data) return; // only decrease
-    node->data = value;
+    void decreaseKey(K key, T value) {
+        PairingHeapNode<K, T> *node = nullptr;
 
-    PairingHeapNode<T>* parent = node->parent;
+        auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
+        if (it == nodeMap.end()) return; //If it does not exist return
+        node = it->second; //Set node ptr equal to the found node
+        if (node->data < value) return; //Make sure this only decreases key
+        node->data = value; //Update value
+
+        PairingHeapNode<K, T>* parent = node->parent;
 
         if (!parent) return; // already root
 
@@ -142,7 +155,7 @@ class PairingHeap {
         minNode = merge(minNode, node);
     }
 
-    void print_(PairingHeapNode<T> *node) {
+    void print_(PairingHeapNode<K, T> *node) {
         cout << node->data << " ";
         if (node->child) print_(node->child);
         if (node->rightSibling) print_(node->rightSibling);
