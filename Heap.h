@@ -2,24 +2,28 @@
 #define HEAPH
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
-template <typename T>
+template <typename K, typename T>
 class HeapNode {
     public:
+    K key;
     T data;
     int index;
 
-    HeapNode(T value) {
-        data = value;
+    HeapNode(K key, T value) {
+        this->key = key;
+        this->data = value;
     }
 };
 
-template <typename T>
+template <typename K, typename T>
 class Heap {
     private:
     //The heap is stored as an array of pointers
-    vector<HeapNode<T>*> heap;
+    vector<HeapNode<K, T>*> heap;
+    unordered_map<K, HeapNode<K, T>*> nodeMap;
 
     void swapNodes(int i, int j) {
         swap(heap[i], heap[j]);
@@ -76,17 +80,18 @@ class Heap {
     }
 
     //Inserts a value into the heap by value
-    HeapNode<T>* insert(T value) {
-        HeapNode<T> *node = new HeapNode<T>(value);
+    void insert(K key, T value) {
+        HeapNode<K, T> *node = new HeapNode<K, T>(key, value);
+        nodeMap[key] = node;
         heap.push_back(node);
         node->index = heap.size()-1;
         percolateUp(heap.size()-1);
-        return node;
     }
 
     //Extracts the minimum value out of the heap
     void extractMin() {
         if (heap.size() < 1) return;
+        nodeMap.erase(heap[0]->key);
         swapNodes(0, heap.size()-1);
         delete heap[heap.size()-1];
         heap.pop_back();
@@ -94,8 +99,19 @@ class Heap {
     }
 
     //Given a node in the heap decrease its value and percolate it up
-    void decreaseKey(HeapNode<T> *node, T value) {
-        if (!node || node->data < value) return; //Make sure this only decreases key
+    void decreaseKey(K key, T value) {
+        HeapNode<K, T> *node = nullptr;
+
+        //Try to get the node from the map using the key
+        try { 
+            node = nodeMap.at(key);
+
+        //Catch exception if can't find node and just return without doing anything
+        } catch (const exception &e) { 
+            return;
+        }
+
+        //Update the nodes value and percolate it up
         node->data = value;
         percolateUp(node->index);
     }

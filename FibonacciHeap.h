@@ -4,40 +4,44 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <unordered_map>
 using namespace std;
 
-template <typename T>
+template <typename K, typename T>
 class FibonacciNode {
     public:
+    K key;
     T data;
     int degree;
     bool marked;
     bool printed;
-    FibonacciNode<T> *parent;
-    FibonacciNode<T> *child;
-    FibonacciNode<T> *rightNode;
-    FibonacciNode<T> *leftNode;
+    FibonacciNode<K, T> *parent;
+    FibonacciNode<K, T> *child;
+    FibonacciNode<K, T> *rightNode;
+    FibonacciNode<K, T> *leftNode;
 
-    FibonacciNode(T key) {
-        data = key;
-        degree = 0;
-        marked = false;
-        printed = false;
-        parent = nullptr;
-        child = nullptr;
-        rightNode = this;
-        leftNode = this;
+    FibonacciNode(K key, T value) {
+        this->key = key;
+        this->data = value;
+        this->degree = 0;
+        this->marked = false;
+        this->printed = false;
+        this->parent = nullptr;
+        this->child = nullptr;
+        this->rightNode = this;
+        this->leftNode = this;
     }
 };
 
-template <typename T>
+template <typename K, typename T>
 class FibonacciHeap {
     private:
-    FibonacciNode<T> *minNode; //The minimum node in the heap
+    FibonacciNode<K, T> *minNode; //The minimum node in the heap
+    unordered_map<K, FibonacciNode<K, T>*> nodeMap;
     int size_; //How many nodes are currently in the heap
 
     //Prints the entire tree but only works once :)
-    void printTree_(FibonacciNode<T> *x) {
+    void printTree_(FibonacciNode<K, T> *x) {
         if (x->printed == true) {
             if (x->parent != nullptr) cout << "] ";
             return;
@@ -52,7 +56,7 @@ class FibonacciHeap {
     }
 
     //Writes the entire tree but only works once :)
-    void writeTree_(ofstream& out, FibonacciNode<T> *x) {
+    void writeTree_(ofstream& out, FibonacciNode<K, T> *x) {
         if (x->printed == true) {
             return;
         }
@@ -70,7 +74,7 @@ class FibonacciHeap {
 
     //Inserts a node into the tree by ptr
     //DOES NOT INCREASE THE SIZE!!
-    void insert(FibonacciNode<T> *node) {
+    void insert(FibonacciNode<K, T> *node) {
         if (minNode == nullptr) { //If list is empty
             minNode = node;
             minNode->rightNode = minNode;
@@ -91,7 +95,7 @@ class FibonacciHeap {
     //though its been removed from list
     //This is not meant to be used for anything
     //other than the root list!
-    void cut(FibonacciNode<T> *y) {
+    void cut(FibonacciNode<K, T> *y) {
         y->marked = false;
         y->leftNode->rightNode = y->rightNode;
         y->rightNode->leftNode = y->leftNode;
@@ -102,14 +106,14 @@ class FibonacciHeap {
     //Cuts the give node out of the list
     //where ever it may be and adds it back
     //to the root list
-    void cascadingCut(FibonacciNode<T> *y) {
+    void cascadingCut(FibonacciNode<K, T> *y) {
 
         //If y has a parent
         //There are three senarios
         //1: the parents direct child is y and y has no siblings
         //2: the parents direct child is y and y has siblings
         //3: the parents direct child is not y
-        FibonacciNode<T>* parent = y->parent; //ptr to y's parent
+        FibonacciNode<K, T>* parent = y->parent; //ptr to y's parent
         if (y->parent) {
             if (y->parent->child == y && y->rightNode == y) { //1: the parents direct child is y and y has no siblings
                 y->parent->child = nullptr;
@@ -136,7 +140,7 @@ class FibonacciHeap {
 
     //Merges two nodes together
     //Returns a ptr to the top level node
-    FibonacciNode<T>* merge(FibonacciNode<T> *x, FibonacciNode<T> *y) {
+    FibonacciNode<K, T>* merge(FibonacciNode<K, T> *x, FibonacciNode<K, T> *y) {
         //If x > y then swap the pointers
         //So that x < y and can be the parent
         //always
@@ -170,23 +174,23 @@ class FibonacciHeap {
         //vector of fibonacci nodes that all all init to
         //nullptr
         int maxDegree = floor(log2(size_)) + 2;
-        vector<FibonacciNode<T>*> degreeList(maxDegree, nullptr);
+        vector<FibonacciNode<K, T>*> degreeList(maxDegree, nullptr);
 
         //Get the number of roots that currently exist
         int rootCount = 0;
-        FibonacciNode<T>* temp = minNode;
+        FibonacciNode<K, T>* temp = minNode;
         do {
             rootCount++;
             temp = temp->rightNode;
         } while (temp != minNode);
 
         //Main loop. Loops through all original root nodes
-        FibonacciNode<T>* currNode = minNode;
+        FibonacciNode<K, T>* currNode = minNode;
         for (int i = 0; i < rootCount; ++i) {
 
             //Advance the nextNode so that we always maintain a ptr
             //to the original root list
-            FibonacciNode<T>* nextNode = currNode->rightNode;
+            FibonacciNode<K, T>* nextNode = currNode->rightNode;
 
             //Cut out the current node
             cut(currNode);
@@ -196,7 +200,7 @@ class FibonacciHeap {
             //Then, move the new node group up the table and repeat
             //until a free space in the list is found to put the group.
             while (degreeList[currNode->degree] != nullptr) {
-                FibonacciNode<T>* other = degreeList[currNode->degree];
+                FibonacciNode<K, T>* other = degreeList[currNode->degree];
                 degreeList[currNode->degree] = nullptr;
                 currNode = merge(currNode, other);
             }
@@ -238,8 +242,9 @@ class FibonacciHeap {
     }
 
     //Inserts a new node into the heap by value/key
-    FibonacciNode<T>* insert(T value) {
-        FibonacciNode<T>* node = new FibonacciNode<T>(value);
+    void insert(K key, T value) {
+        FibonacciNode<K, T>* node = new FibonacciNode<K, T>(key, value);
+        nodeMap[key] = node;
         if (minNode == nullptr) { //If list is empty
             minNode = node;
         } else { //If the list already has a node
@@ -252,7 +257,6 @@ class FibonacciHeap {
             }
         }
         size_++;
-        return node;
     }
 
     void print() {
@@ -282,11 +286,12 @@ class FibonacciHeap {
     //Extracts the minimum values in the heap
     void extractMin() {
         if (!minNode) return;
+        nodeMap.erase(minNode->key);
 
         //If the minNode has child do a little extra work
         if (minNode->child != nullptr) {
-            FibonacciNode<T> *heir = minNode->child;
-            FibonacciNode<T> *currNode = minNode->child;
+            FibonacciNode<K, T> *heir = minNode->child;
+            FibonacciNode<K, T> *currNode = minNode->child;
 
             //Disconnects the childs list from the parent
             minNode->child = nullptr;
@@ -297,8 +302,8 @@ class FibonacciHeap {
             } while(currNode != heir);
 
             //Put the heirs list together with the root list
-            FibonacciNode<T> *A = minNode->leftNode;
-            FibonacciNode<T> *B = heir->leftNode;
+            FibonacciNode<K, T> *A = minNode->leftNode;
+            FibonacciNode<K, T> *B = heir->leftNode;
             A->rightNode = heir;
             heir->leftNode = A;
             minNode->leftNode = B;
@@ -309,7 +314,7 @@ class FibonacciHeap {
         //So that we dont delete the minNode ptr
         //and then lose access to the list because
         //we don't have a pointer to it anymore
-        FibonacciNode<T> *rightNode = minNode->rightNode;
+        FibonacciNode<K, T> *rightNode = minNode->rightNode;
 
         //Now that the children are taken care of
         //extract the minNode
@@ -323,7 +328,7 @@ class FibonacciHeap {
 
         //From the ptr we kept before, find the next min
         minNode = rightNode;
-        FibonacciNode<T> *currNode = rightNode;
+        FibonacciNode<K, T> *currNode = rightNode;
         do {
             if (currNode->data < minNode->data) minNode = currNode;
             currNode = currNode->rightNode;
@@ -332,7 +337,18 @@ class FibonacciHeap {
         mergeRootList();
     }
 
-    void decreaseKey(FibonacciNode<T> *y, T value) {
+    void decreaseKey(K key, T value) {
+        FibonacciNode<K, T> *y = nullptr;
+
+        //Try to get the node from the map using the key
+        try { 
+            y = nodeMap.at(key);
+
+        //Catch exception if can't find node and just return without doing anything
+        } catch (const exception &e) { 
+            return;
+        }
+
         if (y->data < value) return; //Make sure this only decreases key
         y->data = value;
         if (y->parent) { //If y has a parent
