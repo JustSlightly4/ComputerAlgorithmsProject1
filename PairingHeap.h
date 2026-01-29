@@ -168,8 +168,21 @@ class PairingHeap {
     }
 
     //Returns the current minimum value in the heap
-    T min() const {
+    T GetMinValue() const {
         return minNode->data;
+    }
+
+    //Returns the current minimum value in the heap
+    T GetMinKey() const {
+        return minNode->key;
+    }
+
+    bool empty() {
+        return (!minNode);
+    }
+
+    const T& operator[](const K& key) const {
+        return nodeMap.find(key)->second->data;
     }
 
 };

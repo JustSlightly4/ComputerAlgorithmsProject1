@@ -120,8 +120,22 @@ class Heap {
     }
 
     //Returns the current minimum value in the heap
-    T min() const {
+    T GetMinValue() const {
         return heap[0]->data;
+    }
+
+    //Returns the current minimum value in the heap
+    T GetMinKey() const {
+        return heap[0]->key;
+    }
+
+    //Get whether the heap is empty or not
+    bool empty() {
+        return (!heap.size());
+    }
+
+    const T& operator[](const K& key) const {
+        return nodeMap.find(key)->second->data;
     }
 };
 #endif
