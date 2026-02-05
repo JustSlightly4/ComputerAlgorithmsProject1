@@ -6,16 +6,16 @@
 using namespace std;
 
 template <typename K, typename T>
-class PairingHeapNode {
+class PairingNode {
     public:
     K key;
     T data;
-    PairingHeapNode<K, T> *parent;
-    PairingHeapNode<K, T> *child;
-    PairingHeapNode<K, T> *leftSibling;
-    PairingHeapNode<K, T> *rightSibling;
+    PairingNode<K, T> *parent;
+    PairingNode<K, T> *child;
+    PairingNode<K, T> *leftSibling;
+    PairingNode<K, T> *rightSibling;
 
-    PairingHeapNode(K key, T value) {
+    PairingNode(K key, T value) {
         this->key = key;
         this->data = value;
         this->parent = nullptr;
@@ -28,12 +28,12 @@ class PairingHeapNode {
 template <typename K,typename T>
 class PairingHeap {
     private:
-    PairingHeapNode<K, T> *minNode;
-    unordered_map<K, PairingHeapNode<K, T>*> nodeMap;
+    PairingNode<K, T> *minNode;
+    unordered_map<K, PairingNode<K, T>*> nodeMap;
 
 
     //Merges two root nodes together
-    PairingHeapNode<K, T>* merge(PairingHeapNode<K, T>* x, PairingHeapNode<K, T>* y) {
+    PairingNode<K, T>* merge(PairingNode<K, T>* x, PairingNode<K, T>* y) {
 
         //If one of the nodes is null return the other node
         if (!x) return y;
@@ -55,17 +55,17 @@ class PairingHeap {
         return x;
     }
 
-    PairingHeapNode<K, T>* twoPassMerge(PairingHeapNode<K, T>* first) {
+    PairingNode<K, T>* twoPassMerge(PairingNode<K, T>* first) {
         if (!first) return nullptr;
 
         // First pass: pair siblings left to right
-        std::vector<PairingHeapNode<K, T>*> mergedPairs;
+        std::vector<PairingNode<K, T>*> mergedPairs;
 
-        PairingHeapNode<K, T>* curr = first;
+        PairingNode<K, T>* curr = first;
         while (curr) {
-            PairingHeapNode<K, T>* a = curr;
-            PairingHeapNode<K, T>* b = curr->rightSibling;
-            PairingHeapNode<K, T>* next = nullptr;
+            PairingNode<K, T>* a = curr;
+            PairingNode<K, T>* b = curr->rightSibling;
+            PairingNode<K, T>* next = nullptr;
             if (b) next = b->rightSibling;
 
             // Detach
@@ -79,7 +79,7 @@ class PairingHeap {
         }
 
         // Second pass: merge right to left
-        PairingHeapNode<K, T>* result = nullptr;
+        PairingNode<K, T>* result = nullptr;
         for (int i = mergedPairs.size() - 1; i >= 0; --i) {
             result = merge(result, mergedPairs[i]);
         }
@@ -102,7 +102,7 @@ class PairingHeap {
 
     //Insert a new value into the tree
     void insert(K key, T value) {
-        PairingHeapNode<K, T> *node = new PairingHeapNode<K, T>(key, value);
+        PairingNode<K, T> *node = new PairingNode<K, T>(key, value);
         nodeMap[key] = node;
         minNode = merge(minNode, node);
     }
@@ -113,11 +113,11 @@ class PairingHeap {
 
         nodeMap.erase(minNode->key);
 
-        PairingHeapNode<K, T>* old = minNode;
-        PairingHeapNode<K, T>* children = minNode->child;
+        PairingNode<K, T>* old = minNode;
+        PairingNode<K, T>* children = minNode->child;
 
         // Clear parent pointers
-        PairingHeapNode<K, T>* currNode = children;
+        PairingNode<K, T>* currNode = children;
         while (currNode) {
             currNode->parent = nullptr;
             currNode = currNode->rightSibling;
@@ -128,7 +128,7 @@ class PairingHeap {
     }
 
     void decreaseKey(K key, T value) {
-        PairingHeapNode<K, T> *node = nullptr;
+        PairingNode<K, T> *node = nullptr;
 
         auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
         if (it == nodeMap.end()) return; //If it does not exist return
@@ -136,7 +136,7 @@ class PairingHeap {
         if (node->data < value) return; //Make sure this only decreases key
         node->data = value; //Update value
 
-        PairingHeapNode<K, T>* parent = node->parent;
+        PairingNode<K, T>* parent = node->parent;
 
         if (!parent) return; // already root
 
@@ -155,7 +155,7 @@ class PairingHeap {
         minNode = merge(minNode, node);
     }
 
-    void print_(PairingHeapNode<K, T> *node) {
+    void print_(PairingNode<K, T> *node) {
         cout << node->data << " ";
         if (node->child) print_(node->child);
         if (node->rightSibling) print_(node->rightSibling);
