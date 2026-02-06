@@ -22,7 +22,7 @@ vector<int> DijkstrasAlgorithm(const vector<vector<int>>& graph) {
         int minimumValue = minimumEdges.GetMinValue();
         int minimumKey = minimumEdges.GetMinKey();
         minimumEdges.extractMin();
-        if (minimumValue == INF) continue;
+        if (minimumValue == INF) break;
 
         for (int i = 0; i < graph.size(); ++i) {
             if (graph[minimumKey][i] != 0) {
