@@ -342,13 +342,13 @@ class FibonacciHeap {
         mergeRootList();
     }
 
-    void decreaseKey(K key, T value) {
+    bool decreaseKey(K key, T value) {
         FibonacciNode<K, T> *y = nullptr;
 
         auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
-        if (it == nodeMap.end()) return; //If it does not exist return
+        if (it == nodeMap.end()) return false; //If it does not exist return
         y = it->second; //Set node ptr equal to the found node
-        if (y->data < value) return; //Make sure this only decreases key
+        if (y->data < value) return false; //Make sure this only decreases key
         y->data = value; //Update value
 
         if (y->parent) { //If y has a parent
@@ -358,6 +358,7 @@ class FibonacciHeap {
         } else { //If y has no parent is it less than the minNode?
             if (y->data < minNode->data) minNode = y;
         }
+        return true;
     }
 
     bool empty() {

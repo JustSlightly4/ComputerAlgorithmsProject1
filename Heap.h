@@ -99,17 +99,18 @@ class Heap {
     }
 
     //Given a node in the heap decrease its value and percolate it up
-    void decreaseKey(K key, T value) {
+    bool decreaseKey(K key, T value) {
         HeapNode<K, T> *node = nullptr;
 
         auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
-        if (it == nodeMap.end()) return; //If it does not exist return
+        if (it == nodeMap.end()) return false; //If it does not exist return
         node = it->second; //Set node ptr equal to the found node
-        if (node->data < value) return; //Make sure this only decreases key
+        if (node->data < value) return false; //Make sure this only decreases key
         node->data = value; //Update value
 
         //Move the value up the tree if needed
         percolateUp(node->index);
+        return true;
     }
 
     //Prints the entire heap

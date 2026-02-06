@@ -1,12 +1,12 @@
-#ifndef PRIMSALGORITHMH
-#define PRIMSALGORITHMH
+#ifndef DIJKSTRASALGORITHMH
+#define DIJKSTRASALGORITHMH
 #include <vector>
 #include <limits>
 #include <utility>
 using namespace std;
 
 template <template <typename, typename> class HeapType>
-vector<int> PrimsAlgorithm(const vector<vector<int>>& graph) {
+vector<int> DijkstrasAlgorithm(const vector<vector<int>>& graph) {
     if (graph.empty()) return {};
 
     HeapType<int, int> minimumEdges;

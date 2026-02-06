@@ -127,18 +127,18 @@ class PairingHeap {
         minNode = twoPassMerge(children);
     }
 
-    void decreaseKey(K key, T value) {
+    bool decreaseKey(K key, T value) {
         PairingNode<K, T> *node = nullptr;
 
         auto it = nodeMap.find(key); //Try to get an iterator to the node if it exist
-        if (it == nodeMap.end()) return; //If it does not exist return
+        if (it == nodeMap.end()) return false; //If it does not exist return
         node = it->second; //Set node ptr equal to the found node
-        if (node->data < value) return; //Make sure this only decreases key
+        if (node->data < value) return false; //Make sure this only decreases key
         node->data = value; //Update value
 
         PairingNode<K, T>* parent = node->parent;
 
-        if (!parent) return; // already root
+        if (!parent) return true; // already root
 
         // Cut the node out of its sibling list
         if (node->leftSibling) node->leftSibling->rightSibling = node->rightSibling; //If the node has a left sibling
@@ -153,6 +153,7 @@ class PairingHeap {
 
         // Merge node back into the root list
         minNode = merge(minNode, node);
+        return true;
     }
 
     void print_(PairingNode<K, T> *node) {
