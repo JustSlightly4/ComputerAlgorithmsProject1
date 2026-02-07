@@ -30,3 +30,20 @@ Extracting the minimum from a Pairing Heap
 10000000: 3.30817
 10000000: 3.28679
 10000000: 3.30689
+
+Average Insertion Times (seconds):
+Extracting the minimum from a Fibonacci Heap:
+ 1000000: 0.655228
+ 5000000: 3.158097
+ 10000000: 6.583580
+
+Extracting the minimum from a Pairing Heap:
+ 1000000: 0.350365
+ 5000000: 1.641477
+ 10000000: 3.300617
+
+Extracting the minimum from a binary heap:
+ 1000000: 0.659853
+ 5000000: 3.546000
+ 10000000: 7.443800
+

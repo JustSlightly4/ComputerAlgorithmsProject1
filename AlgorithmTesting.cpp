@@ -3,7 +3,6 @@
 #include "PairingHeap.h"
 #include "PrimsAlgorithm.h"
 #include "DijkstrasAlgorithm.h"
-#include "HelperFunctions.h"
 #include <cstring>
 #include <iostream>
 #include <ostream>
@@ -164,6 +163,6 @@ int main(int argc, char **argv) {
     double endTime = getTime();
     
     //interpretMinimumSpanningTree(spanningTree, graph);
-    cout << endTime - startTime << endl;
+    cout << graphSize << ": " << endTime - startTime << endl;
     return 0;
 }

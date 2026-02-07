@@ -30,3 +30,20 @@ Inserting into a Pairing Heap
 10000000: 1.51058
 10000000: 1.46929
 10000000: 1.42944
+
+Average Insertion Times (seconds):
+Inserting into a Fibonacci Heap:
+ 1000000: 0.175788
+ 5000000: 0.783059
+ 10000000: 1.517180
+
+Inserting into a Pairing Heap:
+ 1000000: 0.170252
+ 5000000: 0.797691
+ 10000000: 1.469770
+
+Inserting into a binary heap:
+ 1000000: 0.189328
+ 5000000: 0.888956
+ 10000000: 1.673413
+

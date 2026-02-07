@@ -30,3 +30,20 @@ Decreasing all keys in a Pairing Heap
 10000000: 0.451844
 10000000: 0.450584
 10000000: 0.452646
+
+Average Insertion Times (seconds):
+Decreasing all keys in a Fibonacci Heap:
+ 1000000: 0.045354
+ 5000000: 0.200486
+ 10000000: 0.396718
+
+Decreasing all keys in a Pairing Heap:
+ 1000000: 0.051675
+ 5000000: 0.226886
+ 10000000: 0.451691
+
+Decreasing all keys in a binary heap:
+ 1000000: 0.055033
+ 5000000: 0.242311
+ 10000000: 0.480353
+
