@@ -13,7 +13,6 @@ By Eric Ryan Montgomery, Randy Hannah, and André Bodge
 - [Testing Information](#testing-information)
 - [Coding Conventions](#coding-conventions)
 <br>
-<br>
 
 # Introduction
 The goal of this project is to understand the theoretical complexities of different heaps, their practical performance, implementation complexity, and trade-offs. To achieve this goal, a Fibonacci heap, a Pairing heap, and a binary heap has been constructed along with both Prim's and Dijkstra's algorithms in C++. The file "HeapTesting.cpp" is used to test a standalone version of the heaps while "AlgorithmTesting.cpp" is used to test the heap within both Prim's and Dijkstra's algorithms.
@@ -95,7 +94,6 @@ To run the file, the following command must then be provided to the terminal:
 ```
 ./a.out HeapType(Heap, Fib, Pair) AlgorithmType(Prim, Dijk) GraphSize(int) GraphConnectivity(int) GraphSeed(int)
 ```
-<br>
 <br>
 
 # Coding Conventions
