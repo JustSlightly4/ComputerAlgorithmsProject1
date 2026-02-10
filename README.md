@@ -1,5 +1,5 @@
-By Eric Ryan Montgomery, Randy Hannah, and André Bodge  
 CS 470: Comparative Analysis of Priority Queues in Graph Algorithms
+By Eric Ryan Montgomery, Randy Hannah, and André Bodge  
 
 # Table of Contents
 - [Introduction](#introduction)
