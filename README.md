@@ -110,10 +110,10 @@ string myStringForMyProgram;
 ```
 <br>
 
-### Functions: UpperCase  
+### Functions: camelCase  
 ```
-void MyFunction() {}
-int MySecondFunction() {}
+void myFunction() {}
+int mySecondFunction() {}
 ```
 <br>
 
