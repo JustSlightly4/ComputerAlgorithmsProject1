@@ -15,7 +15,7 @@ CS 470: Comparative Analysis of Priority Queues in Graph Algorithms
   - [Algorithm Testing](#algorithm-testing)
 - [Coding Conventions](#coding-conventions)
   - [Variables](#variables-camelcase)
-  - [Functions](#functions-uppercase)
+  - [Functions](#functions-camelcase)
   - [Classes](#classes-uppercase)
 <br>
 <br>
