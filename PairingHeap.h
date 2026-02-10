@@ -174,7 +174,7 @@ class PairingHeap {
     }
 
     //Returns the current minimum value in the heap
-    T GetMinKey() const {
+    K GetMinKey() const {
         return minNode->key;
     }
 

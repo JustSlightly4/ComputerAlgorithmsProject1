@@ -32,3 +32,19 @@ Dijkstras Algorithm with a pairing heap
 30000: 13.4191
 30000: 13.5156
 
+Average Insertion Times (seconds):
+Dijkstras Algorithm with a binary heap:
+ 10000: 1.512813
+ 20000: 6.046823
+ 30000: 13.619667
+
+Dijkstras Algorithm with a fibonacci heap:
+ 10000: 1.604230
+ 20000: 6.467650
+ 30000: 14.725750
+
+Dijkstras Algorithm with a pairing heap:
+ 10000: 1.510400
+ 20000: 5.993260
+ 30000: 13.481767
+

@@ -30,3 +30,20 @@ Prims Algorithm with a Pairing Heap
 30000: 25.3713
 30000: 25.5407
 30000: 25.3618
+
+Average Insertion Times (seconds):
+Prims Algorithm with a Pairing Heap:
+ 10000: 2.806303
+ 20000: 11.314500
+ 30000: 25.424600
+
+Prims Algorithm with a binary heap:
+ 10000: 2.814137
+ 20000: 11.223267
+ 30000: 25.460533
+
+Prims Algorithm with a fibonacci heap:
+ 10000: 2.764383
+ 20000: 11.151933
+ 30000: 25.053133
+
