@@ -15,8 +15,12 @@ double average(const vector<double>& times) {
     return sum / times.size();
 }
 
-int main() {
-    ifstream infile("decreaseKey.txt"); // replace with your filename
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        cout << "Usage Error: ./a.out filename.txt\n";
+    }
+    string filename = argv[1];
+    ifstream infile(filename); // replace with your filename
     if (!infile) {
         cerr << "Error opening file!" << endl;
         return 1;
