@@ -1,5 +1,5 @@
-CS 470: Comparative Analysis of Priority Queues in Graph Algorithms  
 By Eric Ryan Montgomery, Randy Hannah, and André Bodge  
+CS 470: Comparative Analysis of Priority Queues in Graph Algorithms
 
 # Table of Contents
 - [Introduction](#introduction)
@@ -11,11 +11,17 @@ By Eric Ryan Montgomery, Randy Hannah, and André Bodge
   - [Decrease Key](#decrease-a-nodes-value-in-the-heaps)
   - [Is Empty?](#check-to-see-if-a-heap-is-empty)
 - [Testing Information](#testing-information)
+  - [Heap Testing](#heap-testing)
+  - [Algorithm Testing](#algorithm-testing)
 - [Coding Conventions](#coding-conventions)
+  - [Variables](#variables-camelcase)
+  - [Functions](#functions-uppercase)
+  - [Classes](#classes-uppercase)
+<br>
 <br>
 
 # Introduction
-The goal of this project is to understand the theoretical complexities of different heaps, their practical performance, implementation complexity, and trade-offs. To achieve this goal, a Fibonacci heap, a Pairing heap, and a binary heap has been constructed along with both Prim's and Dijkstra's algorithms in C++. The file "HeapTesting.cpp" is used to test a standalone version of the heaps while "AlgorithmTesting.cpp" is used to test the heap within both Prim's and Dijkstra's algorithms.
+The goal of this project is to understand the theoretical complexities of different heaps, their practical performance, implementation complexity, and trade-offs. To achieve this goal, a Fibonacci heap, a Pairing heap, and a binary heap has been constructed along with both Prim's and Dijkstra's algorithms in C++ and extensive testing has been done to find the differences between the various heaps.
 <br>
 <br>
 
