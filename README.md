@@ -1,4 +1,4 @@
-CS 470: Comparative Analysis of Priority Queues in Graph Algorithms
+CS 470: Comparative Analysis of Priority Queues in Graph Algorithms  
 By Eric Ryan Montgomery, Randy Hannah, and André Bodge  
 
 # Table of Contents
